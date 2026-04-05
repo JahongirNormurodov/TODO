@@ -12,11 +12,7 @@ class TodoViewSet(ModelViewSet):
 
     def get_queryset(self):
         queryset = Todo.objects.select_related("folder", "category").prefetch_related("tags", "labels", "sub_todos")
-        category_pk = self.kwargs.get("category_pk")
-        if category_pk:
-            queryset = queryset.filter(category_id=category_pk)
-        return queryset
-
+        
     def get_serializer_class(self):
         if self.action == "retrieve":
             return TodoDetailSerializer

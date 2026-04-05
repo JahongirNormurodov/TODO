@@ -18,7 +18,7 @@ class SubTodoViewSet(ModelViewSet):
 
     def perform_create(self, serializer):
         todo_pk = self.kwargs.get("todo_pk")
-        if todo_pk:
-            serializer.save(todo_id=todo_pk)
-            return
-        serializer.save()
+        if not todo_pk:
+            raise ValueError("todo_pk is required")
+    
+        serializer.save(todo_id=todo_pk)

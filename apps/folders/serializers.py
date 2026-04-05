@@ -4,6 +4,7 @@ from rest_framework import serializers
 from apps.folders.models import Folder
 
 
+
 class FolderSerializer(serializers.ModelSerializer):
     todo_count = serializers.IntegerField(read_only=True)
 

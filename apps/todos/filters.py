@@ -1,6 +1,9 @@
 import django_filters
 
 from apps.todos.models import Todo
+from django.db.models import Count, Q
+
+
 
 
 class TodoFilter(django_filters.FilterSet):
@@ -13,13 +16,18 @@ class TodoFilter(django_filters.FilterSet):
         model = Todo
         fields = ["folder", "category", "status", "priority"]
 
-    def _split_uuid_csv(self, value: str):
-        return [item.strip() for item in value.split(",") if item.strip()]
-
     def filter_tags(self, queryset, _name, value):
         for tag_id in self._split_uuid_csv(value):
             queryset = queryset.filter(tags__id=tag_id)
         return queryset.distinct()
+    def filter_by_tags(queryset, tag_ids):
+        return queryset.filter(tags__id__in=tag_ids).annotate(
+        matched_tags=Count(
+            "tags",
+            filter=Q(tags__id__in=tag_ids),
+            distinct=True
+        )
+    ).filter(matched_tags=len(tag_ids))
 
     def filter_labels(self, queryset, _name, value):
         for label_id in self._split_uuid_csv(value):

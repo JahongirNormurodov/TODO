@@ -4,6 +4,8 @@ from .base import *
 
 DEBUG = False
 ALLOWED_HOSTS = os.getenv("DJANGO_ALLOWED_HOSTS", "").split(",") if os.getenv("DJANGO_ALLOWED_HOSTS") else []
+SECRET_KEY = os.environ["DJANGO_SECRET_KEY"]
+
 
 DATABASES = {
     "default": {

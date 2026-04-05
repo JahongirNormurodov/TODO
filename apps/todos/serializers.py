@@ -9,6 +9,12 @@ from apps.tags.models import Tag
 from apps.todos.models import Todo
 
 
+class TodoDetailSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Todo
+        fields = "__all__"
+
+
 class TagCompactSerializer(serializers.ModelSerializer):
     class Meta:
         model = Tag
@@ -77,11 +83,6 @@ class TodoListSerializer(serializers.ModelSerializer):
         if label_ids is not None:
             instance.labels.set(Label.objects.filter(id__in=label_ids))
 
-    def validate(self, attrs):
-        folder = attrs.get("folder")
-        if self.instance is None and folder is None:
-            raise serializers.ValidationError({"folder": ["This field is required."]})
-        return attrs
 
     def create(self, validated_data):
         tag_ids = validated_data.pop("tag_ids", None)
@@ -97,41 +98,6 @@ class TodoListSerializer(serializers.ModelSerializer):
         self._set_m2m(instance, tag_ids, label_ids)
         return instance
 
-
-class TodoDetailSerializer(TodoListSerializer):
-    folder = FolderCompactSerializer(read_only=True)
-    category = CategoryCompactSerializer(read_only=True)
-    sub_todos = serializers.SerializerMethodField()
-
-    class Meta(TodoListSerializer.Meta):
-        fields = [
-            "id",
-            "folder",
-            "category",
-            "title",
-            "description",
-            "priority",
-            "status",
-            "due_date",
-            "position",
-            "tags",
-            "labels",
-            "sub_todos",
-            "sub_todo_stats",
-            "created_at",
-            "updated_at",
-        ]
-        read_only_fields = [
-            "id",
-            "folder",
-            "category",
-            "tags",
-            "labels",
-            "sub_todos",
-            "sub_todo_stats",
-            "created_at",
-            "updated_at",
-        ]
 
     def get_sub_todos(self, obj):
         queryset = SubTodo.objects.filter(todo=obj).order_by("position")

@@ -1,4 +1,4 @@
-]wfrom django.db.models import Count
+from django.db.models import Count
 from rest_framework import serializers
 
 from apps.categories.models import Category
